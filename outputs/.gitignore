@@ -1,0 +1,10 @@
+.env
+.env.*
+!.env.example
+config.local.js
+dist/
+.build-staging-*/
+node_modules/
+.netlify/
+*.zip
+capturas-fekamovies/

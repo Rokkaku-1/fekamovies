@@ -1,0 +1,30 @@
+'use strict';
+// Lista única para publicar, servir y empaquetar. Nunca recorrer outputs indiscriminadamente.
+const files = [
+  'index.html',
+  'app.css',
+  'app.js',
+  'admin.html',
+  'admin.css',
+  'admin.js',
+  'mobile.css',
+  'embed-catalog.js',
+  'hero-slider.js',
+  'media-source.js',
+  'tv-online.js',
+  'tv-online.css',
+  'tmdb-client.js',
+  'pwa.js',
+  'sw.js',
+  'offline.html',
+  'manifest.webmanifest',
+  'dmca.html',
+  'legal.css',
+  'legal.js',
+  'icons/logo.svg',
+  'icons/icon-192.png',
+  'icons/icon-512.png',
+  'icons/icon-maskable.png',
+  'icons/apple-touch-icon.png',
+];
+module.exports = { files };

@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <meta name="theme-color" content="#0b0a10" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Estudio · FekaMovies</title>
+    <link rel="stylesheet" href="./admin.css" />
+    <script src="./tmdb-client.js"></script>
+    <script src="./supabase-config.js"></script>
+    <!-- Versionar la dependencia compartida evita mezclar el panel nuevo con una caché anterior. -->
+    <script src="./embed-catalog.js?v=15"></script>
+    <script src="./media-source.js?v=18"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js" defer></script>
+    <script src="./admin.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="wordmark" href="./index.html"
+        ><svg
+          viewBox="0 0 32 32"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M4 13h24v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zM4 13 2 7l23-5 2 6zM8 6l4 5m4-7 4 5" />
+          <path d="m13 17 7 4-7 4z" /></svg
+        >Feka<span>Movies</span></a
+      ><span class="topbar__label">ESTUDIO / ADMINISTRACIÓN</span
+      ><a class="quiet-link" href="./index.html" target="_blank" rel="noopener">Ver sitio ↗</a>
+    </header>
+    <main>
+      <section class="login" id="login-view" aria-labelledby="login-title">
+        <div class="eyebrow"><span></span> TU ESPACIO DE PUBLICACIÓN</div>
+        <h1 id="login-title">Grandes historias.<br /><span>Detrás de escena.</span></h1>
+        <p class="intro">Organiza películas, capítulos y servidores desde un solo lugar.</p>
+        <form id="login-form" class="surface login__form">
+          <h2>Entrar al estudio</h2>
+          <p class="muted">Usa tu cuenta de administrador de FekaMovies.</p>
+          <label for="email">Correo electrónico</label
+          ><input id="email" type="email" autocomplete="username" required /> <label for="password">Contraseña</label
+          ><input id="password" type="password" autocomplete="current-password" minlength="8" required />
+          <button class="button" type="submit">Entrar <span aria-hidden="true">→</span></button>
+          <button class="text-button" id="register" type="button">Primera vez: crear mi cuenta</button>
+          <p class="fine">
+            Crear una cuenta no concede permisos de administrador. Necesitas una invitación del propietario.
+          </p>
+        </form>
+      </section>
+      <section class="access surface" id="pending-view" hidden>
+        <p class="eyebrow">ACCESO RESTRINGIDO</p>
+        <h1>Tu cuenta está creada.</h1>
+        <p>Confirma tu correo y espera la autorización del propietario para entrar al estudio.</p>
+        <button class="button secondary" id="check-access" type="button">Comprobar acceso</button
+        ><button class="text-button" id="pending-logout" type="button">Cerrar sesión</button>
+      </section>
+      <section class="workspace" id="workspace" hidden aria-labelledby="workspace-title">
+        <aside class="sidebar">
+          <p class="eyebrow">BIBLIOTECA</p>
+          <a class="sidebar__item active" href="#catalogue">▤ <span>Contenido</span></a
+          ><a class="sidebar__item" href="#editor">＋ <span>Añadir reproductor</span></a
+          ><a class="sidebar__item" href="#featured-editor">▷ <span>Portada</span></a>
+          <div class="sidebar__account">
+            <span class="online-dot"></span><span id="account-email"></span
+            ><button id="logout" class="text-button" type="button">Cerrar sesión</button>
+          </div>
+        </aside>
+        <div class="workspace__main">
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">ESTUDIO FEKAMOVIES</p>
+              <h1 id="workspace-title">Tu catálogo, bajo control.</h1>
+              <p class="muted">Añade un enlace. Elige el capítulo. Publica cuando esté listo.</p>
+            </div>
+            <button class="button secondary" id="new-record" type="button">＋ Nuevo contenido</button>
+          </div>
+          <div class="stats">
+            <div><span>REPRODUCTORES</span><strong id="stat-total">0</strong></div>
+            <div><span>PUBLICADOS</span><strong id="stat-published">0</strong></div>
+            <div><span>BORRADORES</span><strong id="stat-drafts">0</strong></div>
+          </div>
+          <div class="editor-grid" id="editor">
+            <section class="surface lookup" aria-labelledby="lookup-title">
+              <p class="step">01 / ELIGE LA HISTORIA</p>
+              <h2 id="lookup-title">Buscar en TMDB</h2>
+              <form id="lookup-form">
+                <label for="lookup-type">Tipo de contenido</label
+                ><select id="lookup-type">
+                  <option value="movie">Películas</option>
+                  <option value="tv">Series</option></select
+                ><label for="lookup-query">Título</label>
+                <div class="input-action">
+                  <input
+                    id="lookup-query"
+                    type="search"
+                    placeholder="Busca una película o serie"
+                    minlength="2"
+                    required
+                  /><button class="icon-button" aria-label="Buscar en TMDB" type="submit">⌕</button>
+                </div>
+              </form>
+              <p id="lookup-status" class="fine" role="status"></p>
+              <div id="lookup-results" class="lookup-results"></div>
+              <p class="fine">También puedes introducir el ID de TMDB manualmente en el formulario.</p>
+            </section>
+            <section class="surface" aria-labelledby="editor-title">
+              <div class="section-heading">
+                <div>
+                  <p class="step">02 / CONECTA EL REPRODUCTOR</p>
+                  <h2 id="editor-title">Nuevo reproductor</h2>
+                </div>
+                <span class="badge" id="editing-badge">BORRADOR</span>
+              </div>
+              <form id="content-form">
+                <div class="field-pair">
+                  <div>
+                    <label for="media-type">Tipo</label
+                    ><select id="media-type">
+                      <option value="movie">Película</option>
+                      <option value="tv">Serie / capítulo</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="tmdb-id">ID de TMDB</label
+                    ><input id="tmdb-id" type="number" min="1" step="1" required />
+                  </div>
+                </div>
+                <label for="content-title">Título de la película o serie</label
+                ><input id="content-title" maxlength="300" required />
+                <div class="field-pair" id="episode-fields" hidden>
+                  <div>
+                    <label for="season">Temporada <span class="fine">(0 = especiales)</span></label
+                    ><input id="season" type="number" min="0" step="1" value="1" list="season-options" /><datalist
+                      id="season-options"
+                    ></datalist>
+                  </div>
+                  <div>
+                    <label for="episode">Capítulo</label
+                    ><input id="episode" type="number" min="1" step="1" value="1" list="episode-options" /><datalist
+                      id="episode-options"
+                    ></datalist>
+                  </div>
+                </div>
+                <p class="fine" id="episode-help"></p>
+                <div class="field-pair">
+                  <div>
+                    <label for="provider">Formato o proveedor</label
+                    ><select id="provider">
+                      <option value="mp4">Video directo · MP4</option>
+                      <option value="hls">Streaming HLS · .m3u8</option>
+                      <option value="okru">OK.ru</option>
+                      <option value="youtube">YouTube</option>
+                      <option value="vimeo">Vimeo</option>
+                      <option value="dailymotion">Dailymotion</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="server-label">Nombre del servidor</label
+                    ><input id="server-label" maxlength="80" value="Servidor principal" required />
+                  </div>
+                </div>
+                <label for="embed-input" id="source-label">Enlace o código iframe</label
+                ><textarea
+                  id="embed-input"
+                  rows="3"
+                  placeholder="https://ok.ru/video/… o <iframe src=…>"
+                  required
+                ></textarea>
+                <p class="fine">
+                  Pega un iframe de un proveedor compatible o una URL HTTPS de MP4 / .m3u8. Para HLS, el servidor debe
+                  permitir CORS. Aquí se guarda el enlace; el archivo permanece en tu alojamiento.
+                </p>
+                <button class="text-button" id="preview-button" type="button">▷ Comprobar reproductor</button>
+                <div class="form-actions">
+                  <button class="button secondary" type="submit" value="draft">Guardar borrador</button
+                  ><button class="button" type="submit" value="published">Publicar contenido ↗</button>
+                </div>
+                <p class="fine">
+                  Un capítulo publicado habilita “Ver capítulo” en la web. Un borrador permanece oculto para los
+                  visitantes.
+                </p>
+              </form>
+            </section>
+          </div>
+          <section class="surface library" id="featured-editor" aria-labelledby="featured-title">
+            <div class="section-heading">
+              <div>
+                <p class="step">LA PRIMERA ESCENA</p>
+                <h2 id="featured-title">Destacados de portada</h2>
+              </div>
+              <span class="badge" id="featured-count">0 / 4</span>
+            </div>
+            <p class="muted">
+              Elige hasta cuatro películas o series. Busca un título en TMDB arriba y selecciónalo; después pulsa
+              «Añadir a portada». No necesita tener un iframe para destacar su tráiler.
+            </p>
+            <button class="button secondary" id="featured-add" type="button">
+              ＋ Añadir título seleccionado a portada
+            </button>
+            <ol id="featured-list" class="featured-list" aria-label="Orden de los destacados"></ol>
+            <div class="form-actions">
+              <button class="button" id="featured-save" type="button">Guardar portada</button
+              ><button class="text-button" id="featured-reload" type="button">Descartar cambios</button>
+            </div>
+            <p class="fine" id="featured-status" role="status">Cargando portada…</p>
+            <p class="fine">
+              El orden de la lista es el del slider. Si guardas la lista vacía, la portada mostrará cuatro películas de
+              cartelera automáticamente.
+            </p>
+          </section>
+          <section class="surface library" id="catalogue" aria-labelledby="catalogue-title">
+            <div class="section-heading">
+              <div>
+                <p class="step">TU BIBLIOTECA</p>
+                <h2 id="catalogue-title">Reproductores guardados</h2>
+              </div>
+              <button class="text-button" id="refresh-records" type="button">↻ Actualizar</button>
+            </div>
+            <div class="library__filters">
+              <input
+                type="search"
+                id="record-search"
+                aria-label="Buscar en el catálogo"
+                placeholder="Buscar por título, ID o servidor…"
+              /><select id="record-filter" aria-label="Filtrar por publicación">
+                <option value="all">Todo el contenido</option>
+                <option value="published">Publicados</option>
+                <option value="draft">Borradores</option>
+              </select>
+            </div>
+            <div id="record-list" class="record-list"></div>
+            <p class="fine" id="record-status" role="status"></p>
+          </section>
+        </div>
+      </section>
+    </main>
+    <p class="notice" id="notice" role="status" aria-live="polite" hidden></p>
+    <dialog class="preview" id="preview-dialog" aria-labelledby="preview-title">
+      <div class="section-heading">
+        <h2 id="preview-title">Vista previa del reproductor</h2>
+        <button class="icon-button" id="preview-close" aria-label="Cerrar vista previa" type="button">✕</button>
+      </div>
+      <div id="preview-player"></div>
+      <p class="fine" id="preview-status" role="status">La reproducción depende de la fuente y de su alojamiento.</p>
+    </dialog>
+    <dialog
+      class="preview delete-dialog"
+      id="delete-dialog"
+      aria-labelledby="delete-title"
+      aria-describedby="delete-message"
+    >
+      <h2 id="delete-title">Eliminar reproductor</h2>
+      <p class="muted" id="delete-message"></p>
+      <div class="form-actions">
+        <button class="button secondary" id="delete-cancel" type="button" autofocus>Cancelar</button
+        ><button class="button" id="delete-confirm" type="button">Eliminar reproductor</button>
+      </div>
+    </dialog>
+  </body>
+</html>

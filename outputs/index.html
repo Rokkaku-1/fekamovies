@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#050507" />
+    <meta
+      name="description"
+      content="FekaMovies: descubre películas y series, explora tendencias y reproduce el contenido publicado."
+    />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>FekaMovies — Historias que se sienten.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./app.css" />
+    <link rel="stylesheet" href="./mobile.css" />
+    <script src="./pwa.js" defer></script>
+    <link rel="stylesheet" href="./tv-online.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#inicio">Saltar al contenido</a>
+
+    <!-- HEADER · Logo de texto y navegación del catálogo -->
+    <header class="header">
+      <div class="header__inner container">
+        <a class="wordmark" href="#inicio" aria-label="FekaMovies, inicio"
+          ><svg
+            viewBox="0 0 32 32"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M4 13h24v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zM4 13 2 7l23-5 2 6zM8 6l4 5m4-7 4 5" />
+            <path d="m13 17 7 4-7 4z" /></svg
+          >Feka<span>Movies</span></a
+        >
+        <nav class="nav" id="navigation" aria-label="Navegación principal">
+          <a class="nav__link" href="#inicio" aria-current="page">Inicio</a>
+          <a class="nav__link" href="#series">Series</a>
+          <a class="nav__link" href="#peliculas">Películas</a>
+          <a class="nav__link" href="#mas-vistos">Lo más visto</a><a class="nav__link" href="#tv-online">TV online</a>
+          <button
+            class="search-toggle"
+            id="search-toggle"
+            data-open-search
+            type="button"
+            aria-label="Buscar películas y series"
+            aria-haspopup="dialog"
+            aria-controls="search-dialog"
+          >
+            <svg
+              width="21"
+              height="21"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <circle cx="10.8" cy="10.8" r="6.8"></circle>
+              <path d="m16 16 4.5 4.5"></path>
+            </svg>
+          </button>
+        </nav>
+        <button
+          class="install-button"
+          id="install-app"
+          type="button"
+          aria-label="Instalar FekaMovies como aplicación"
+          hidden
+        >
+          Instalar app
+        </button>
+      </div>
+    </header>
+
+    <!-- HERO · Película destacada de TMDB, degradados y estrellas CSS -->
+    <main>
+      <section class="offline-status" id="offline-status" aria-labelledby="offline-title" hidden>
+        <h2 id="offline-title">Sin conexión</h2>
+        <p>Puedes explorar lo guardado. Conéctate para cargar nuevos títulos y videos.</p>
+        <button class="button button--secondary" id="offline-retry" type="button">Reintentar</button>
+      </section>
+      <section class="hero" id="inicio" aria-labelledby="hero-title">
+        <div class="hero__scene" aria-hidden="true">
+          <img class="hero__backdrop" id="hero-backdrop" alt="" hidden fetchpriority="high" decoding="async" />
+          <div class="orb orb--violet"></div>
+          <div class="orb orb--blue"></div>
+          <div class="orb orb--rose"></div>
+          <div class="horizon"></div>
+          <div class="stars"></div>
+        </div>
+        <div class="grain" aria-hidden="true"></div>
+        <div class="hero__content" aria-busy="true">
+          <p class="eyebrow" id="hero-kicker">Una historia que merece tu pantalla</p>
+          <h1 id="hero-title">Tu próxima gran historia.</h1>
+          <p class="hero__description" id="hero-description">Estamos preparando el estreno destacado para ti.</p>
+          <div class="hero__actions">
+            <button
+              class="button"
+              id="hero-watch"
+              type="button"
+              aria-haspopup="dialog"
+              aria-controls="detail-dialog"
+              disabled
+            >
+              Ver tráiler
+            </button>
+          </div>
+          <p class="hero__status" id="hero-status" role="status">Cargando destacado…</p>
+        </div>
+        <div class="hero-slider" id="hero-slider-controls" role="group" aria-label="Controles de destacados" hidden>
+          <button type="button" data-step="-1" aria-label="Destacado anterior">←</button>
+          <div class="hero-slider__dots" id="hero-slider-dots" role="group" aria-label="Elegir destacado"></div>
+          <button type="button" data-step="1" aria-label="Siguiente destacado">→</button>
+          <span class="hero-slider__count" id="hero-slider-count">01 / 04</span>
+        </div>
+        <p class="sr-only" id="hero-slider-announcement" role="status" aria-live="polite"></p>
+        <div class="hero__bottom container" aria-hidden="true">
+          <span class="scene-label">Todo empieza con una historia</span>
+        </div>
+        <div class="scroll-indicator" aria-hidden="true">
+          <span>Desliza</span><span class="scroll-indicator__track"></span>
+        </div>
+      </section>
+      <!-- FILTROS · Se aplican a todas las filas sin nuevas peticiones -->
+      <div class="catalogue-filters container" role="group" aria-label="Filtrar por disponibilidad">
+        <button class="filter-button" type="button" data-filter="all" aria-pressed="true">Todo</button>
+        <button class="filter-button" type="button" data-filter="available" aria-pressed="false">Disponibles</button>
+        <button class="filter-button" type="button" data-filter="unavailable" aria-pressed="false">
+          No disponibles
+        </button>
+        <button class="filter-button" type="button" data-filter="upcoming" aria-pressed="false">Próximamente</button>
+      </div>
+      <!-- CATÁLOGO · Datos y pósteres de TMDB -->
+      <section class="catalogue container" id="disponibles" aria-labelledby="disponibles-title">
+        <div class="catalogue__heading">
+          <div>
+            <p class="catalogue__kicker">Dale play</p>
+            <h2 id="disponibles-title">Disponibles para ver</h2>
+          </div>
+          <div class="carousel-controls" aria-label="Controles de Disponibles">
+            <button
+              class="carousel-control"
+              type="button"
+              data-carousel="disponibles-carousel"
+              data-direction="-1"
+              aria-label="Anterior en Disponibles"
+              disabled
+            >
+              ←
+            </button>
+            <button
+              class="carousel-control"
+              type="button"
+              data-carousel="disponibles-carousel"
+              data-direction="1"
+              aria-label="Siguiente en Disponibles"
+              disabled
+            >
+              →
+            </button>
+          </div>
+        </div>
+        <p class="catalogue__description">Películas y series con reproducción publicada en FekaMovies.</p>
+        <div
+          class="carousel"
+          id="disponibles-carousel"
+          role="list"
+          aria-label="Disponibles para ver"
+          aria-describedby="disponibles-status"
+          aria-busy="true"
+          tabindex="0"
+        ></div>
+        <p class="catalogue__status" id="disponibles-status" role="status">Cargando catálogo…</p>
+      </section>
+
+      <section class="catalogue container" id="peliculas" aria-labelledby="peliculas-title">
+        <div class="catalogue__heading">
+          <div>
+            <p class="catalogue__kicker">Recién llegadas</p>
+            <h2 id="peliculas-title">Estrenos recientes</h2>
+          </div>
+          <div class="carousel-controls" aria-label="Controles de Estrenos recientes">
+            <button
+              class="carousel-control"
+              type="button"
+              data-carousel="peliculas-carousel"
+              data-direction="-1"
+              aria-label="Anterior en Estrenos recientes"
+              aria-controls="peliculas-carousel"
+              disabled
+            >
+              ←
+            </button>
+            <button
+              class="carousel-control"
+              type="button"
+              data-carousel="peliculas-carousel"
+              data-direction="1"
+              aria-label="Siguiente en Estrenos recientes"
+              aria-controls="peliculas-carousel"
+              disabled
+            >
+              →
+            </button>
+          </div>
+        </div>
+        <p class="catalogue__description">Descubre las novedades del cine.</p>
+        <div
+          class="carousel"
+          id="peliculas-carousel"
+          role="list"
+          aria-label="Estrenos recientes"
+          aria-describedby="peliculas-status"
+          aria-busy="true"
+          tabindex="0"
+        ></div>
+        <p class="catalogue__status" id="peliculas-status" role="status">Cargando catálogo…</p>
+        <noscript><p>Activa JavaScript para cargar el catálogo de TMDB.</p></noscript>
+      </section>
+
+      <section class="catalogue container" id="proximamente" aria-labelledby="proximamente-title">
+        <div class="catalogue__heading">
+          <div>
+            <p class="catalogue__kicker">Historias por descubrir</p>
+            <h2 id="proximamente-title">Próximamente</h2>
+          </div>
+          <div class="carousel-controls" aria-label="Controles de Próximamente">
+            <button
+              class="carousel-control"
+              type="button"
+              data-carousel="proximamente-carousel"
+              data-direction="-1"
+              aria-label="Anterior en Próximamente"
+              aria-controls="proximamente-carousel"
+              disabled
+            >
+              ←
+            </button>
+            <button
+              class="carousel-control"
+              type="button"
+              data-carousel="proximamente-carousel"
+              data-direction="1"
+              aria-label="Siguiente en Próximamente"
+              aria-controls="proximamente-carousel"
+              disabled
+            >
+              →
+            </button>
+          </div>
+        </div>
+        <p class="catalogue__description">Películas y nuevas series que se estrenarán próximamente.</p>
+        <div
+          class="carousel"
+          id="proximamente-carousel"
+          role="list"
+          aria-label="Próximamente"
+          aria-describedby="proximamente-status"
+          aria-busy="true"
+          tabindex="0"
+        ></div>
+        <p class="catalogue__status" id="proximamente-status" role="status">Cargando catálogo…</p>
+        <noscript><p>Activa JavaScript para cargar el catálogo de TMDB.</p></noscript>
+      </section>
+
+      <section class="catalogue container" id="mas-vistos" aria-labelledby="mas-vistos-title">
+        <div class="catalogue__heading">
+          <div>
+            <p class="catalogue__kicker">En tendencia esta semana</p>
+            <h2 id="mas-vistos-title">Lo más visto</h2>
+          </div>
+          <div class="carousel-controls" aria-label="Controles de Lo más visto">
+            <button
+              class="carousel-control"
+              type="button"
+              data-carousel="mas-vistos-carousel"
+              data-direction="-1"
+              aria-label="Anterior en Lo más visto"
+              aria-controls="mas-vistos-carousel"
+              disabled
+            >
+              ←
+            </button>
+            <button
+              class="carousel-control"
+              type="button"
+              data-carousel="mas-vistos-carousel"
+              data-direction="1"
+              aria-label="Siguiente en Lo más visto"
+              aria-controls="mas-vistos-carousel"
+              disabled
+            >
+              →
+            </button>
+          </div>
+        </div>
+        <p class="catalogue__description">Las películas y series que están dando de qué hablar.</p>
+        <div
+          class="carousel"
+          id="mas-vistos-carousel"
+          role="list"
+          aria-label="Lo más visto"
+          aria-describedby="mas-vistos-status"
+          aria-busy="true"
+          tabindex="0"
+        ></div>
+        <p class="catalogue__status" id="mas-vistos-status" role="status">Cargando catálogo…</p>
+        <noscript><p>Activa JavaScript para cargar el catálogo de TMDB.</p></noscript>
+      </section>
+
+      <section class="catalogue container" id="series" aria-labelledby="series-title">
+        <div class="catalogue__heading">
+          <div>
+            <p class="catalogue__kicker">Un episodio más</p>
+            <h2 id="series-title">Series populares</h2>
+          </div>
+          <div class="carousel-controls" aria-label="Controles de Series populares">
+            <button
+              class="carousel-control"
+              type="button"
+              data-carousel="series-carousel"
+              data-direction="-1"
+              aria-label="Anterior en Series populares"
+              aria-controls="series-carousel"
+              disabled
+            >
+              ←
+            </button>
+            <button
+              class="carousel-control"
+              type="button"
+              data-carousel="series-carousel"
+              data-direction="1"
+              aria-label="Siguiente en Series populares"
+              aria-controls="series-carousel"
+              disabled
+            >
+              →
+            </button>
+          </div>
+        </div>
+        <p class="catalogue__description">Encuentra tu próxima serie para seguir.</p>
+        <div
+          class="carousel"
+          id="series-carousel"
+          role="list"
+          aria-label="Series populares"
+          aria-describedby="series-status"
+          aria-busy="true"
+          tabindex="0"
+        ></div>
+        <p class="catalogue__status" id="series-status" role="status">Cargando catálogo…</p>
+        <noscript><p>Activa JavaScript para cargar el catálogo de TMDB.</p></noscript>
+      </section>
+      <!-- TV ONLINE · Señales HLS, independiente de los filtros de películas y series. -->
+      <section class="tv-online container" id="tv-online" aria-labelledby="tv-title">
+        <div class="tv-heading">
+          <div>
+            <p class="tv-eyebrow">UNA VENTANA AL MUNDO</p>
+            <h2 id="tv-title">TV online</h2>
+            <p>Historias que están pasando ahora. Descubre canales y encuentra algo nuevo en directo.</p>
+          </div>
+          <span class="tv-heading__tag">CANALES EN DIRECTO ↗</span>
+        </div>
+        <div class="tv-workspace">
+          <div class="tv-screen" aria-labelledby="tv-player-title">
+            <div class="tv-stage" id="tv-stage">
+              <div class="tv-video" id="tv-video"></div>
+              <div class="tv-placeholder" id="tv-placeholder">
+                <span class="tv-placeholder__eyebrow">TU CANAL, TU MOMENTO</span>
+                <button class="tv-play" id="tv-play" type="button" aria-label="Reproducir canal" disabled>
+                  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m8 5 11 7-11 7z" /></svg>
+                </button>
+                <strong id="tv-ready-title">Elige un canal</strong>
+                <span id="tv-ready-help">La reproducción empieza solo cuando tú pulses play.</span>
+              </div>
+            </div>
+            <div class="tv-screen__info">
+              <div class="tv-screen__copy">
+                <p class="tv-screen__eyebrow" id="tv-playback-state">TV EN DIRECTO</p>
+                <h3 id="tv-player-title">Elige qué quieres ver</h3>
+                <p id="tv-player-status" role="status">Selecciona un canal de la lista para prepararlo.</p>
+              </div>
+              <button class="tv-button" id="tv-stop" type="button" hidden>■ Detener</button>
+            </div>
+            <label class="tv-signal-label" id="tv-signal-label" for="tv-signal" hidden
+              >Señal<select id="tv-signal"></select
+            ></label>
+          </div>
+          <aside class="tv-sidebar" aria-labelledby="tv-list-title">
+            <div class="tv-sidebar__header">
+              <div class="tv-sidebar__heading">
+                <h3 id="tv-list-title">Canales</h3>
+                <span class="tv-live">EN DIRECTO</span>
+              </div>
+              <div class="tv-filters">
+                <label class="tv-query-label" for="tv-query">Buscar canal</label
+                ><input
+                  type="search"
+                  id="tv-query"
+                  aria-label="Buscar canal"
+                  placeholder="Buscar un canal…"
+                  autocomplete="off"
+                />
+                <div>
+                  <label for="tv-country">País</label
+                  ><select id="tv-country">
+                    <option value="">Todos</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="tv-category">Categoría</label
+                  ><select id="tv-category">
+                    <option value="">Todas</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div
+              class="tv-channel-scroll"
+              id="tv-channel-scroll"
+              tabindex="0"
+              aria-label="Lista de canales, desplazamiento vertical"
+            >
+              <div class="tv-grid" id="tv-grid" role="group" aria-label="Canales de televisión" aria-busy="false"></div>
+              <div class="tv-actions">
+                <button class="tv-button" type="button" id="tv-more" hidden>Mostrar más canales ↓</button>
+              </div>
+            </div>
+            <div class="tv-sidebar__footer">
+              <p class="tv-status" id="tv-status" role="status">Cargando canales…</p>
+              <button class="tv-button" type="button" id="tv-retry" hidden>Volver a intentar</button>
+            </div>
+          </aside>
+        </div>
+        <p class="tv-source">
+          Señales y catálogo:
+          <a href="https://github.com/iptv-org/iptv" target="_blank" rel="noopener noreferrer">iptv-org</a>. La
+          disponibilidad depende de cada emisora.
+        </p>
+      </section>
+    </main>
+    <!-- FOOTER · Marca y cierre -->
+    <footer class="footer">
+      <div class="footer__inner container">
+        <a class="wordmark" href="#inicio" aria-label="FekaMovies, volver al inicio"
+          ><svg
+            viewBox="0 0 32 32"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M4 13h24v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zM4 13 2 7l23-5 2 6zM8 6l4 5m4-7 4 5" />
+            <path d="m13 17 7 4-7 4z" /></svg
+          >Feka<span>Movies</span></a
+        >
+        <p>
+          Cine, series y nuevas historias. · <a href="./dmca.html">Derechos de autor y DMCA</a
+          ><span id="catalog-connection" role="status" hidden></span>
+        </p>
+      </div>
+    </footer>
+
+    <!-- REPRODUCTOR · La navegación móvil usa las mismas secciones y el mismo buscador. -->
+    <nav class="bottom-nav" aria-label="Navegación móvil">
+      <a class="bottom-nav__item" href="#inicio" aria-label="Inicio" aria-current="location"
+        ><svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="m3 10 9-7 9 7v10h-6v-7H9v7H3z" /></svg
+        ><span>Inicio</span></a
+      >
+      <a class="bottom-nav__item" href="#peliculas" aria-label="Películas"
+        ><svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <rect x="3" y="4" width="18" height="16" rx="2" />
+          <path d="M3 9h18M7 4l3 5m4-5 3 5" /></svg
+        ><span>Películas</span></a
+      >
+      <a class="bottom-nav__item" href="#series" aria-label="Series"
+        ><svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <rect x="3" y="6" width="18" height="13" rx="2" />
+          <path d="m8 2 4 4 4-4M9 22h6" /></svg
+        ><span>Series</span></a
+      >
+      <a class="bottom-nav__item" href="#tv-online" aria-label="TV online"
+        ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <rect x="3" y="5" width="18" height="14" rx="3" />
+          <path d="m9 2 3 3 3-3M9 22h6" /></svg
+        ><span>TV online</span></a
+      ><button
+        class="bottom-nav__item"
+        id="mobile-search"
+        data-open-search
+        type="button"
+        aria-label="Buscar películas y series"
+        aria-haspopup="dialog"
+        aria-controls="search-dialog"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <circle cx="10.5" cy="10.5" r="6.5" />
+          <path d="m16 16 5 5" /></svg
+        ><span>Buscar</span>
+      </button>
+    </nav>
+    <div class="pwa-notices">
+      <div class="pwa-notice" id="pwa-update" role="status" hidden>
+        <span>Hay una nueva versión</span
+        ><button id="pwa-reload" type="button" aria-label="Actualizar FekaMovies">Actualizar</button>
+      </div>
+      <div class="pwa-notice" id="ios-guide" role="status" hidden>
+        <span>Compartir → Añadir a pantalla de inicio</span
+        ><button id="ios-dismiss" type="button" aria-label="Cerrar guía de instalación">✕</button>
+      </div>
+    </div>
+
+    <!-- BÚSQUEDA · Dialog nativo: foco atrapado y fondo inerte. El detalle se abre encima. -->
+    <dialog class="search-modal" id="search-dialog" role="dialog" aria-modal="true" aria-labelledby="search-title">
+      <div class="search__inner container">
+        <h2 class="search__heading" id="search-title">Encuentra tu próxima historia</h2>
+        <form class="search__form" id="search-form" role="search">
+          <input
+            class="search__input"
+            id="search-input"
+            type="search"
+            placeholder="Películas y series"
+            aria-label="Buscar películas y series"
+            aria-describedby="search-status"
+            autocomplete="off"
+            spellcheck="false"
+            enterkeyhint="search"
+            autofocus
+          />
+          <button class="search__cancel" id="search-cancel" type="button">Cancelar</button>
+        </form>
+        <div
+          class="search__filters"
+          id="search-type-filters"
+          hidden
+          role="group"
+          aria-label="Filtrar resultados por tipo"
+        >
+          <button class="filter-button" type="button" data-search-filter="all" aria-pressed="true">Todo</button>
+          <button class="filter-button" type="button" data-search-filter="movie" aria-pressed="false">Películas</button>
+          <button class="filter-button" type="button" data-search-filter="tv" aria-pressed="false">Series</button>
+        </div>
+        <p class="search__status" id="search-status" role="status" aria-live="polite">
+          Escribe al menos 2 caracteres para buscar.
+        </p>
+        <div class="search__initial" id="search-initial">
+          <section class="search__recents" id="search-recents" aria-labelledby="recent-title" hidden>
+            <div class="search__section-heading">
+              <h3 id="recent-title">Búsquedas recientes</h3>
+              <button class="recent-clear" id="recent-clear" type="button">Borrar todo</button>
+            </div>
+            <div class="recent-chips" id="recent-chips" role="list" aria-label="Búsquedas recientes"></div>
+          </section>
+          <section class="search__trends" aria-labelledby="trends-title">
+            <div class="search__section-heading"><h3 id="trends-title">Tendencias ahora</h3></div>
+            <p class="search__status" id="trends-status" role="status" aria-live="polite"></p>
+            <div
+              class="search-results"
+              id="trends-results"
+              role="list"
+              aria-label="Tendencias ahora"
+              aria-busy="false"
+            ></div>
+          </section>
+        </div>
+        <div
+          class="search-results"
+          id="search-results"
+          hidden
+          role="list"
+          aria-label="Resultados de búsqueda"
+          aria-busy="false"
+        ></div>
+        <button class="button button--secondary search__retry" id="search-retry" type="button" hidden>
+          Volver a intentar
+        </button>
+      </div>
+    </dialog>
+
+    <!-- DETALLE · Sin iframe hasta que se abre una tarjeta con tráiler -->
+    <dialog class="detail-modal" id="detail-dialog" role="dialog" aria-modal="true" aria-labelledby="detail-title">
+      <div class="detail__panel">
+        <div class="detail__sheet-handle" aria-hidden="true"><span></span></div>
+        <button class="detail__close" type="button" aria-label="Cerrar detalle" autofocus>✕</button>
+        <p class="detail__status" role="status" aria-live="polite"></p>
+        <div class="detail__content" aria-busy="false"></div>
+      </div>
+    </dialog>
+
+    <!-- REPRODUCTOR · Capa superior nativa; video montado solo tras la entrada. -->
+    <dialog class="playback" id="playback-dialog" role="dialog" aria-modal="true" aria-labelledby="playback-title">
+      <div class="playback__surface" tabindex="-1">
+        <div class="playback__video" id="playback-video"></div>
+        <div class="playback__topbar">
+          <div class="playback__title-group">
+            <span class="playback__demo" id="playback-demo">Demo</span>
+            <h2 id="playback-title">Reproducción</h2>
+          </div>
+          <button class="playback__button" id="playback-close" type="button" aria-label="Cerrar reproductor">✕</button>
+        </div>
+        <div class="playback__buffering" id="playback-buffering" role="status" hidden>
+          <span aria-hidden="true"></span>Cargando video…
+        </div>
+        <div class="playback__error" id="playback-error" role="alert" hidden>
+          <p id="playback-error-text"></p>
+          <button class="button" id="playback-retry" type="button">Reintentar</button>
+        </div>
+        <div class="playback__controls" id="playback-controls">
+          <p class="playback__hint" id="playback-hint" role="status" aria-live="polite"></p>
+          <label class="playback__servers" id="playback-servers" hidden
+            >Servidor
+            <select id="playback-source" aria-label="Elegir servidor"></select
+          ></label>
+          <div class="playback__episodes" id="playback-episodes" hidden>
+            <button
+              class="playback__button playback__next"
+              id="playback-next"
+              type="button"
+              aria-label="Reproducir siguiente capítulo"
+              disabled
+            >
+              Siguiente capítulo →
+            </button>
+            <label class="playback__autonext"
+              ><input id="playback-autonext" type="checkbox" checked />Reproducir siguiente automáticamente</label
+            >
+          </div>
+          <div class="playback__seek">
+            <input
+              id="playback-progress"
+              type="range"
+              min="0"
+              max="100"
+              step="0.1"
+              value="0"
+              aria-label="Posición del video"
+              disabled
+            /><output id="playback-time">00:00 / 00:00</output>
+          </div>
+          <div class="playback__actions">
+            <button class="playback__button playback__play" id="playback-play" type="button" aria-label="Reproducir">
+              ▶
+            </button>
+            <button
+              class="playback__button"
+              id="playback-mute"
+              type="button"
+              aria-label="Silenciar"
+              aria-pressed="false"
+            >
+              Sonido: sí
+            </button>
+            <input
+              class="playback__volume"
+              id="playback-volume"
+              type="range"
+              min="0"
+              max="1"
+              step="0.05"
+              value="0.8"
+              aria-label="Volumen"
+            />
+            <label class="playback__captions"
+              >Subtítulos
+              <select id="playback-subtitles" aria-label="Subtítulos" disabled>
+                <option value="-1">Sin subtítulos</option>
+              </select></label
+            >
+            <button
+              class="playback__button playback__fullscreen"
+              id="playback-fullscreen"
+              type="button"
+              aria-label="Pantalla completa"
+            >
+              ⛶
+            </button>
+          </div>
+          <p class="playback__credit">
+            Video demo: Big Buck Bunny © 2008 Blender Foundation ·
+            <a href="https://peach.blender.org/about/" target="_blank" rel="noopener">CC BY 3.0</a>
+          </p>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- Configuración publicable de esta instalación; secretos solo en servidor. -->
+    <script src="./tmdb-client.js"></script>
+
+    <script src="./supabase-config.js"></script>
+    <script src="./embed-catalog.js"></script>
+    <script src="./media-source.js"></script>
+    <script src="./tv-online.js"></script>
+    <script src="./hero-slider.js"></script>
+
+    <!-- GSAP + ScrollTrigger: versiones fijadas; el contenido funciona sin CDN. -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
+    <script src="./app.js" defer></script>
+  </body>
+</html>
