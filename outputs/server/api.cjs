@@ -1,6 +1,7 @@
 /* Proxy de lectura TMDB: host fijo, rutas/parámetros permitidos, caché y errores sin secretos. */
 'use strict';
 const { publicSettings } = require('./settings.cjs');
+const { createFootballGuide } = require('./football-guide.cjs');
 const ROUTES =
   /^(?:\/trending\/(?:all|movie|tv)\/(?:day|week)|\/movie\/(?:now_playing|upcoming|popular)|\/tv\/popular|\/discover\/(?:movie|tv)|\/search\/(?:multi|movie|tv)|\/(?:movie|tv)\/[1-9]\d{0,9}|\/tv\/[1-9]\d{0,9}\/season\/(?:0|[1-9]\d?))$/;
 const PARAMETERS = {
@@ -50,7 +51,8 @@ function upstreamURL(pathname, searchParams) {
   url.searchParams.set('include_adult', 'false');
   return url;
 }
-function createAPI({ env = process.env, fetchImpl = fetch, now = Date.now } = {}) {
+function createAPI({ env = process.env, fetchImpl = fetch, now = Date.now, readGuide } = {}) {
+  const footballGuide = createFootballGuide({ env, fetchImpl, now, readGuide });
   const cache = new Map(),
     pending = new Map(),
     clients = new Map();
@@ -72,6 +74,11 @@ function createAPI({ env = process.env, fetchImpl = fetch, now = Date.now } = {}
     if (fetchSite === 'cross-site' || (origin && expectedOrigin && origin !== expectedOrigin))
       return json(403, { error: 'Origen no permitido.' });
     const request = new URL(url, 'http://localhost');
+    if (request.pathname === '/api/football-guide' || request.pathname === '/.netlify/functions/api/football-guide') {
+      if ([...request.searchParams].length) return json(400, {error:'Consulta no admitida.'});
+      if (rateLimited(ip)) return json(429, {error:'Demasiadas consultas.'}, {'Retry-After':'60'});
+      return json(200, await footballGuide());
+    }
     if (request.pathname === '/api/site' || request.pathname === '/.netlify/functions/api/site') {
       try {
         return json(200, { dmcaEmail: publicSettings(env).dmcaEmail });

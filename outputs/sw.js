@@ -1,6 +1,6 @@
 /* FekaMovies · PWA. Incrementar VERSION al publicar cambios del app shell. */
 'use strict';
-const VERSION = 'v24';
+const VERSION = 'v33-tv-categories';
 // Aísla las cachés de otras aplicaciones en subcarpetas del mismo dominio.
 const PREFIX = 'lumen-' + encodeURIComponent(new URL(self.registration.scope).pathname) + '-';
 const SHELL = PREFIX + VERSION + '-shell';
@@ -29,6 +29,11 @@ const PRECACHE = [
   'hero-slider.js',
   'media-source.js',
   'tv-online.js',
+  'tv.html',
+  'tv-page.js',
+  'tv-page.css',
+  'tv-curation.js',
+  'football-core.js',
   'tv-online.css',
   'icons/logo.svg',
   'icons/icon-192.png',

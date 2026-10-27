@@ -1,4 +1,6 @@
 // 01. Catálogo: consultas al servidor; ninguna clave privada llega al navegador.
+// Compatibilidad con enlaces guardados antes de separar TV del catálogo.
+if (location.hash === '#tv-online') location.replace(new URL('./tv.html', document.baseURI).href);
 const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/w500';
 const MAX_RESULTS = 15;
 const OVERLAY_CLEAR_PROPS = 'transform,scale,y,opacity,visibility,willChange';
@@ -2474,7 +2476,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       updates.onmessage = () => void actualizarCatalogoPublicado();
     }
   }
-  window.FekaTV?.init();
   setupPlayback();
   setupDetailModal();
   setupSearch();

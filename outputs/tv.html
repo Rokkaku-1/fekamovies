@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="es"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/><meta name="theme-color" content="#050507"/>
+<title>TV en directo — FekaMovies</title><meta name="description" content="Tu espacio para ver TV en directo. Canales destacados por país, modo cine y un reproductor a tu medida."/>
+<link rel="manifest" href="./manifest.webmanifest"/><link rel="apple-touch-icon" href="./icons/apple-touch-icon.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./app.css"/><link rel="stylesheet" href="./mobile.css"/><link rel="stylesheet" href="./tv-online.css"/><link rel="stylesheet" href="./tv-page.css"/>
+<script src="./pwa.js" defer></script><script src="./media-source.js" defer></script><script src="./football-core.js" defer></script><script src="./tv-curation.js" defer></script><script src="./tv-online.js" defer></script><script src="./tv-page.js" defer></script>
+</head><body class="tv-page"><a class="skip-link" href="#tv-online">Saltar al reproductor</a><header class="header is-scrolled"><div class="header__inner container">
+  <a class="wordmark" href="./index.html" aria-label="FekaMovies, inicio"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 13h24v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zM4 13 2 7l23-5 2 6zM8 6l4 5m4-7 4 5"/><path d="m13 17 7 4-7 4z"/></svg>Feka<span>Movies</span></a>
+  <nav class="nav" aria-label="Navegación principal"><a class="nav__link" href="./index.html">Catálogo</a><a class="nav__link tv-nav-secondary" href="./index.html#peliculas">Películas</a><a class="nav__link tv-nav-secondary" href="./index.html#series">Series</a><a class="nav__link" href="./tv.html" aria-current="page">TV online</a></nav>
+  <button class="install-button" id="install-app" type="button" aria-label="Instalar FekaMovies como aplicación" hidden>Instalar app</button>
+</div></header>
+<main><section class="offline-status" id="offline-status" aria-labelledby="offline-title" hidden><h2 id="offline-title">Sin conexión</h2><p>Conéctate a internet para cargar los canales y sus señales.</p><button class="tv-button" id="offline-retry" type="button">Reintentar</button></section>      <!-- TV ONLINE · Señales HLS, independiente de los filtros de películas y series. -->
+      <section class="tv-online container" id="tv-online" aria-labelledby="tv-title">
+        <div class="tv-heading">
+          <div>
+            <p class="tv-eyebrow">TU VENTANA AL MUNDO</p>
+            <h1 id="tv-title">Tu televisión, en directo.</h1>
+            <p>Canales de aquí y del mundo. Elige qué ver; nosotros ponemos la pantalla.</p>
+          </div>
+          <button class="tv-button tv-theater" id="tv-theater" type="button" aria-pressed="false">Modo cine <span aria-hidden="true">↔</span></button>
+        </div>
+        <div class="tv-workspace">
+          <div class="tv-player-column"><div class="tv-screen" id="tv-screen" aria-labelledby="tv-player-title">
+            <div class="tv-stage" id="tv-stage">
+              <div class="tv-video" id="tv-video"></div>
+              <div class="tv-placeholder" id="tv-placeholder"><div class="tv-placeholder__mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="7" width="26" height="19" rx="5"/><path d="m11 2 5 5 5-5M11 30h10"/></svg></div>
+                <span class="tv-placeholder__eyebrow">TU CANAL, TU MOMENTO</span>
+                <button class="tv-play" id="tv-play" type="button" aria-label="Reproducir canal" disabled>
+                  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m8 5 11 7-11 7z" /></svg>
+                </button>
+                <strong id="tv-ready-title">Elige un canal</strong>
+                <span id="tv-ready-help">La reproducción empieza solo cuando tú pulses play.</span>
+              </div>
+            </div>
+            <div class="tv-toolbar" role="group" aria-label="Controles del reproductor">
+    <button id="tv-reconnect" class="tv-tool" type="button" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M5 8a8 8 0 0 1 13-2l2 3M4 15l2 3a8 8 0 0 0 13-2"/></svg><span>Reconectar</span></button>
+    <button id="tv-fit" class="tv-tool" type="button" aria-pressed="false" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h10v6H7z"/></svg><span>Ajustar imagen</span></button>
+    <button id="tv-pip" class="tv-tool" type="button" hidden disabled><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><rect x="12" y="11" width="8" height="7" rx="1"/></svg><span>Ventana flotante</span></button>
+    <button id="tv-fullscreen" class="tv-tool" type="button" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg><span>Pantalla completa</span></button>
+  </div><p id="tv-tool-status" class="tv-tool-status" role="status"></p><div class="tv-screen__info">
+              <div class="tv-screen__copy">
+                <p class="tv-screen__eyebrow" id="tv-playback-state">TV EN DIRECTO</p>
+                <h3 id="tv-player-title">Elige qué quieres ver</h3>
+                <p id="tv-player-status" role="status">Selecciona un canal de la lista para prepararlo.</p>
+              </div>
+              <button class="tv-button" id="tv-stop" type="button" hidden>■ Detener</button>
+            </div>
+            <label class="tv-signal-label" id="tv-signal-label" for="tv-signal" hidden
+              >Señal<select id="tv-signal"></select
+            ></label>
+            <details class="tv-programme-details"><summary>Programación y detalles del canal</summary><div class="tv-programme" id="tv-programme" aria-live="polite"></div></details>
+          </div>
+          </div><aside class="tv-sidebar" aria-labelledby="tv-list-title">
+            <div class="tv-sidebar__header">
+              <div class="tv-sidebar__heading">
+                <h3 id="tv-list-title">Canales destacados</h3>
+                <span class="tv-live">EXPLORAR</span>
+              </div>
+              <div class="tv-filters">
+                <label class="tv-query-label" for="tv-query">Buscar canal o partido</label
+                ><input
+                  type="search"
+                  id="tv-query"
+                  aria-label="Buscar canal o partido"
+                  placeholder="Canal, equipo o partido…"
+                  autocomplete="off"
+                />
+                <div>
+                  <label for="tv-country">País del canal</label
+                  ><select id="tv-country">
+                    <option value="">Todos</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="tv-category">Categoría</label
+                  ><select id="tv-category">
+                    <option value="">Todos los canales</option>
+                  </select>
+                </div>
+                <label class="tv-confirmed" for="tv-confirmed"><input type="checkbox" id="tv-confirmed" />Solo partidos confirmados</label>
+              </div>
+            </div>
+            <div
+              class="tv-channel-scroll"
+              id="tv-channel-scroll"
+              tabindex="0"
+              aria-label="Lista de canales, desplazamiento vertical"
+            >
+              <div class="tv-grid" id="tv-grid" role="group" aria-label="Canales de televisión" aria-busy="false"></div>
+              <div class="tv-actions">
+                <button class="tv-button" type="button" id="tv-more" hidden>Mostrar más canales ↓</button>
+              </div>
+            </div>
+            <div class="tv-sidebar__footer">
+              <p class="tv-status" id="tv-status" role="status">Cargando canales…</p>
+              <button class="tv-button" type="button" id="tv-retry" hidden>Volver a intentar</button>
+            </div>
+          </aside>
+        </div>
+        <p class="tv-guide-status" id="tv-guide-status" role="status">La programación se confirma cuando hay una guía disponible.</p>
+        <p class="tv-source">
+          Señales y catálogo:
+          <a href="https://github.com/iptv-org/iptv" target="_blank" rel="noopener noreferrer">iptv-org</a>. La
+          disponibilidad depende de cada emisora.
+        </p>
+      </section>
+</main>
+<footer class="tv-page-footer container"><a href="./index.html">← Volver al catálogo</a><a href="./dmca.html">Derechos de autor y DMCA</a><span>FekaMovies · Tu canal, tu momento.</span></footer>    <div class="pwa-notices">
+      <div class="pwa-notice" id="pwa-update" role="status" hidden>
+        <span>Hay una nueva versión</span
+        ><button id="pwa-reload" type="button" aria-label="Actualizar FekaMovies">Actualizar</button>
+      </div>
+      <div class="pwa-notice" id="ios-guide" role="status" hidden>
+        <span>Compartir → Añadir a pantalla de inicio</span
+        ><button id="ios-dismiss" type="button" aria-label="Cerrar guía de instalación">✕</button>
+      </div>
+    </div>
+
+</body></html>

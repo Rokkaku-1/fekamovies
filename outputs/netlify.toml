@@ -8,6 +8,7 @@
 
 [functions]
   node_bundler = "esbuild"
+  included_files = ["data/football-guide.json"]
 
 [[redirects]]
   from = "/api/*"

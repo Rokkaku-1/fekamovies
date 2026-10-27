@@ -1,54 +1,22 @@
-# Solo publicar los archivos necesarios para ejecutar y configurar la página.
-/*
-!/.gitignore
-!/README.md
-!/outputs/
-/outputs/*
-!/outputs/index.html
-!/outputs/config.example.js
-!/outputs/manifest.webmanifest
-!/outputs/sw.js
-!/outputs/pwa.js
-!/outputs/mobile.css
-!/outputs/offline.html
-!/outputs/README.md
-!/outputs/icons/
-!/outputs/admin.html
-!/outputs/admin.css
-!/outputs/admin.js
-!/outputs/supabase-config.js
-!/outputs/supabase-config.example.js
-!/outputs/embed-catalog.js
-!/outputs/hero-slider.js
-!/outputs/supabase/
-!/outputs/serve.cjs
-!/outputs/start-lumen.cmd
-!/outputs/netlify.toml
-!/outputs/ADMIN.md
-!/outputs/REVISION-CODIGO.md
-!/outputs/SEGURIDAD.md
-!/outputs/AUDITORIA-SEGURIDAD.md
-
-# Credenciales locales: nunca versionarlas.
-**/config.local.js
+# Configuración privada
+.env
+.env.*
+!.env.example
 **/.env
 **/.env.*
-**/.netlify/
+!**/.env.example
+**/config.local.js
 
-!/outputs/media-source.js
-!/outputs/tv-online.js
-!/outputs/tv-online.css
-!/netlify.toml
-!/outputs/app.css
-!/outputs/app.js
-!/outputs/tmdb-client.js
-!/outputs/dmca.html
-!/outputs/legal.css
-!/outputs/legal.js
-!/outputs/server/
-!/outputs/scripts/
-!/outputs/netlify/
-!/outputs/.env.example
-!/outputs/.gitignore
-/outputs/dist/
-/outputs/.build-staging-*/
+# Dependencias y archivos generados
+node_modules/
+**/node_modules/
+outputs/dist/
+outputs/.build-staging-*/
+**/.netlify/
+work/
+*.zip
+capturas-fekamovies/
+
+# Entregables ajenos a la aplicación y registros locales
+outputs/plantilla-apuestas-*/
+outputs/*.log

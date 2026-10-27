@@ -1,0 +1,36 @@
+{
+  "updatedAt": "2026-10-26T20:17:06.988Z",
+  "sources": [
+    {
+      "channel": "TyCSports.ar",
+      "site": "mi.tv",
+      "ok": true,
+      "count": 33
+    },
+    {
+      "channel": "TVPeru.pe",
+      "site": "mi.tv",
+      "ok": true,
+      "count": 47
+    },
+    {
+      "channel": "CaracolTV.co",
+      "site": "mi.tv",
+      "ok": false,
+      "count": 0
+    },
+    {
+      "channel": "CanalRCN.co",
+      "site": "mi.tv",
+      "ok": false,
+      "count": 0
+    },
+    {
+      "channel": "Teledeporte.es",
+      "site": "movistarplus.es",
+      "ok": true,
+      "count": 80
+    }
+  ],
+  "programmes": []
+}

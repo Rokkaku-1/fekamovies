@@ -20,7 +20,8 @@ try {
     if (fallbackError.code !== 'ENOENT') throw fallbackError;
   }
 }
-const handle = createAPI();
+const handle = createAPI({readGuide: () => fs.readFile(path.join(root, 'data/football-guide.json'), 'utf8')});
+require('./server/epg-refresh.cjs').startEPGRefresh();
 const allowed = new Set(files);
 const types = {
   '.html': 'text/html; charset=utf-8',

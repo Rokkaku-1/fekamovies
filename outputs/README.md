@@ -23,6 +23,7 @@ Para otra instalación, copia outputs/.env.example como .env en la raíz del rep
 | admin.html / admin.css / admin.js | Panel protegido por Supabase Auth y RLS |
 | embed-catalog.js / media-source.js | Catálogo publicado, normalización y reproducción MP4/HLS/iframe |
 | hero-slider.js / tv-online.js / tv-online.css | Portada y TV con Play manual y lista lateral |
+| tv.html / tv-page.js / tv-page.css | Página independiente de TV, modo cine y controles del reproductor |
 | mobile.css / pwa.js / sw.js | Adaptación móvil, instalación y caché |
 | dmca.html / legal.css / legal.js | Política de derechos de autor y contacto configurable |
 | supabase/ | Instalación, invitaciones, permisos y verificaciones SQL |
@@ -44,7 +45,11 @@ Los valores publicables de Supabase necesitan estar disponibles durante Build. C
 
 ## Funciones
 
+TV muestra una selección editorial de cadenas reconocidas, con hasta doce canales por país en Latinoamérica (trece en Perú para incluir América TV) y cinco en el resto, logos de iptv-org e idioma de la señal. Prioriza Latinoamérica y España en español y acepta idiomas originales de otros países. No es un ranking medido de audiencia. Criterios y mantenimiento en [TV-ONLINE.md](TV-ONLINE.md). Los filtros de fútbol y la guía verificada se conservan; instalación y pruebas en [FUTBOL-TV.md](FUTBOL-TV.md).
+
 El catálogo conserva sus estados, filtros, búsqueda, recientes, temporadas, capítulos, tráileres, fuentes MP4/HLS e iframes y cuatro destacados administrables. TV online muestra reproductor y lista con scroll: no se crea un video hasta que el usuario pulsa Play. Cambiar canal o señal detiene el anterior. La PWA no almacena Auth, borradores, videos ni respuestas del contacto DMCA.
+
+La guía local consulta programación de hoy y mañana cada seis horas mientras el servidor esté abierto, si están instalados los lectores EPG. Su cobertura es limitada y solo muestra partidos identificados con equipos, competición y horario. Instalación, fuentes y actualización manual en [FUTBOL-TV.md](FUTBOL-TV.md).
 
 ## Plantilla para terceros
 
